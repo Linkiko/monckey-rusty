@@ -1,17 +1,16 @@
 use std::env;
-use std::process::exit;
 use std::fs;
 
-mod token;
-use token::{Token};
+pub mod token;
+use token::Token;
 
-mod lexer;
+pub mod lexer;
+pub mod repl;
 
 fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
     if args.len() == 1 {
-        println!("Error: Wrong number of inputs");
-        exit(1);
+        repl::start();
     }
     let input = fs::read_to_string(args[1].to_string()).expect("Error: Filepath is not correct");
     let mut lex = lexer::Lexer::new(&input);

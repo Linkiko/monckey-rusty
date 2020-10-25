@@ -1,16 +1,14 @@
+use crate::token::{self, Token};
 use std::iter::Peekable;
 use std::str::Chars;
-use crate::token;
-use crate::token::{Token};
 
 pub struct Lexer<'a> {
-    input: Peekable<Chars<'a>>
+    input: Peekable<Chars<'a>>,
 }
 
 fn is_letter(ch: char) -> bool {
     ch.is_alphabetic() || ch == '_'
 }
-
 
 impl<'a> Lexer<'a> {
     pub fn new(input: &'a str) -> Self {
@@ -29,13 +27,11 @@ impl<'a> Lexer<'a> {
 
     fn read_identifier(&mut self, ch: char) -> String {
         let mut identifier = String::new();
-        
         identifier.push(ch);
-        while let Some(&ch) =  self.peek_char() {
+        while let Some(&ch) = self.peek_char() {
             if is_letter(ch) {
                 identifier.push(self.read_char().unwrap());
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -49,8 +45,7 @@ impl<'a> Lexer<'a> {
         while let Some(&ch) = self.peek_char() {
             if ch.is_numeric() {
                 number.push(self.read_char().unwrap());
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -61,8 +56,7 @@ impl<'a> Lexer<'a> {
         while let Some(&ch) = self.peek_char() {
             if ch.is_whitespace() {
                 self.read_char();
-            }
-            else {
+            } else {
                 break;
             }
         }
@@ -72,7 +66,21 @@ impl<'a> Lexer<'a> {
         self.skip_whitespace();
         match self.read_char() {
             Some('+') => Token::Plus,
-            Some('=') => Token::Assign,
+            Some('=') => match self.peek_char() {
+                Some('=') => {
+                    self.read_char();
+                    Token::Eq
+                }
+                _ => Token::Assign,
+            },
+            Some('-') => Token::Minus,
+            Some('!') => match self.peek_char() {
+                Some('=') => Token::NotEq,
+                _ => Token::Bang,
+            },
+            Some('*') => Token::Asterisk,
+            Some('<') => Token::Lt,
+            Some('>') => Token::Gt,
             Some(',') => Token::Comma,
             Some(';') => Token::Semicolon,
             Some('(') => Token::LParenthesis,
@@ -83,15 +91,13 @@ impl<'a> Lexer<'a> {
                 if is_letter(ch) {
                     let identifier = self.read_identifier(ch);
                     token::lookup_identifier(identifier)
-                }
-                else if ch.is_numeric() {
+                } else if ch.is_numeric() {
                     Token::Int(self.read_int(ch))
-                }
-                else {
+                } else {
                     Token::Illegal
                 }
-            },
-            None => Token::EOF
+            }
+            None => Token::EOF,
         }
     }
 }
