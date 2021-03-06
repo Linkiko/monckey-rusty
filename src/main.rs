@@ -6,6 +6,8 @@ use token::Token;
 
 pub mod lexer;
 pub mod repl;
+pub mod ast;
+mod parser;
 
 fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
