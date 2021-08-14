@@ -4,10 +4,14 @@ use std::fs;
 pub mod token;
 use token::Token;
 
-pub mod lexer;
-pub mod repl;
 pub mod ast;
+pub mod lexer;
 mod parser;
+pub mod repl;
+
+fn titi() -> () {
+    println!("titi");
+}
 
 fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
